@@ -52,8 +52,12 @@ public class SlackApiCaller {
     }
 
     public void postMessages(HashSet<String> messages) {
+        StringBuilder allMessage = new StringBuilder();
+
         for (var message : messages) {
-            postMessage(message);
+            allMessage.append(message).append("\n");
         }
+
+        postMessage(allMessage.toString());
     }
 }
