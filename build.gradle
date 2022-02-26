@@ -23,6 +23,15 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // retrofit2 dependencies
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-scalars
+    implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
+    implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
+
 }
 
 tasks.named('test') {
