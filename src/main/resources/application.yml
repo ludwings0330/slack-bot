@@ -1,3 +1,7 @@
 api:
   leopold:
     base-url: https://www.leopold.co.kr/
+
+spring:
+  profiles:
+    active: secret
