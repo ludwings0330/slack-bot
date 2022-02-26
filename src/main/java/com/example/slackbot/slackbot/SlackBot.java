@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 
@@ -20,9 +19,9 @@ public class SlackBot {
 
     private final int REPEAT_TIME = 1000 * 60 * 60 * 12;
 
-    private HashSet<String> prevNotices = new HashSet<>();
+    private final HashSet<String> prevNotices = new HashSet<>();
 
-    public SlackBot(LeopoldApiCaller leopoldApiCaller, SlackApiCaller slackApiCaller, Parser parser) throws IOException {
+    public SlackBot(LeopoldApiCaller leopoldApiCaller, SlackApiCaller slackApiCaller, Parser parser) {
         this.leopoldApiCaller = leopoldApiCaller;
         this.slackApiCaller = slackApiCaller;
         this.parser = parser;
@@ -35,14 +34,18 @@ public class SlackBot {
         }
     }
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = REPEAT_TIME)
     public void postLeopoldNoticeToSlack() {
         String strLeopoldNoticeHtml = leopoldApiCaller.getLeopoldNotice();
         HashSet<String> findNotices = parser.parse(strLeopoldNoticeHtml);
-        String messageInfo = "[업데이트 일자] " + LocalDateTime.now().toString();
+        String messageInfo = "[업데이트 일자] " + LocalDateTime.now();
         removePreviousNotice(prevNotices, findNotices);
-
+        saveCurrentNotices(findNotices);
         slackApiCaller.postMessage(messageInfo);
         slackApiCaller.postMessages(findNotices);
+    }
+
+    private void saveCurrentNotices(HashSet<String> findNotices) {
+        prevNotices.addAll(findNotices);
     }
 }
