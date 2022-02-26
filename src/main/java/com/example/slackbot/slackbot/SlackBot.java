@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 
 @Component
@@ -42,10 +43,11 @@ public class SlackBot implements Runnable {
 
                 String strLeopoldNoticeHtml = leopoldApiCaller.getLeopoldNotice();
                 HashSet<String> findNotices = parser.parse(strLeopoldNoticeHtml);
-
+                String messageInfo = "[업데이트 일자] " + LocalDateTime.now().toString();
                 removePreviousNotice(prevNotices, findNotices);
 
-                slackApiCaller.postLeopoldNotice(findNotices);
+                slackApiCaller.postMessage(messageInfo);
+                slackApiCaller.postMessages(findNotices);
 
                 Thread.sleep(REPEAT_TIME);
             } catch (InterruptedException e) {

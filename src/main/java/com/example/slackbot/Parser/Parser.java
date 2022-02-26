@@ -1,7 +1,8 @@
 package com.example.slackbot.Parser;
 
+import java.util.HashSet;
 import java.util.List;
 
 public interface Parser {
-    List<String> parse(String target);
+    HashSet<String> parse(String target);
 }
