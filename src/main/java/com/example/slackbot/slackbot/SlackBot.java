@@ -36,6 +36,7 @@ public class SlackBot {
 
     @Scheduled(fixedDelay = REPEAT_TIME)
     public void postLeopoldNoticeToSlack() {
+        log.info("레오폴드 공지사항 점검 실행");
         String strLeopoldNoticeHtml = leopoldApiCaller.getLeopoldNotice();
         HashSet<String> findNotices = parser.parse(strLeopoldNoticeHtml);
         String messageInfo = "[업데이트 일자] " + LocalDateTime.now();
@@ -46,6 +47,7 @@ public class SlackBot {
     }
 
     private void saveCurrentNotices(HashSet<String> findNotices) {
+        log.info("신규 공지사항 저장");
         prevNotices.addAll(findNotices);
     }
 }
