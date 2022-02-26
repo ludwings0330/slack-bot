@@ -6,6 +6,7 @@ import com.example.slackbot.slackApi.SlackApiCaller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -25,8 +26,6 @@ public class SlackBot implements Runnable {
         this.leopoldApiCaller = leopoldApiCaller;
         this.slackApiCaller = slackApiCaller;
         this.parser = parser;
-
-        this.run();
     }
 
     private void removePreviousNotice(HashSet<String> prevNotices, HashSet<String> currentNotice) {
@@ -37,6 +36,7 @@ public class SlackBot implements Runnable {
     }
 
     @Override
+    @PostConstruct
     public void run() {
         while (true) {
             try {
