@@ -3,51 +3,57 @@ package com.example.slackbot.slackbot;
 import com.example.slackbot.LeopoldApi.LeopoldApiCaller;
 import com.example.slackbot.Parser.Parser;
 import com.example.slackbot.slackApi.SlackApiCaller;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class SlackBot {
     private final LeopoldApiCaller leopoldApiCaller;
     private final SlackApiCaller slackApiCaller;
     private final Parser parser;
-
-    private final int REPEAT_TIME = 1000 * 60 * 60 * 12;
-
     private final HashSet<String> prevNotices = new HashSet<>();
 
-    public SlackBot(LeopoldApiCaller leopoldApiCaller, SlackApiCaller slackApiCaller, Parser parser) {
-        this.leopoldApiCaller = leopoldApiCaller;
-        this.slackApiCaller = slackApiCaller;
-        this.parser = parser;
-    }
+    // 매일 오전,오후 9시에 실행한다.
+    @Scheduled(cron = "0 0 9,21 * * *")
+    public void postLeopoldNotices() {
+        log.info("레오폴드 공지사항 점검 실행");
+        HashSet<String> newNotices = getNewNotices();
 
-    private void removePreviousNotice(HashSet<String> prevNotices, HashSet<String> currentNotice) {
-        for (String notice :
-                prevNotices) {
-            currentNotice.remove(notice);
+        if (hasUpdate(newNotices.size())) {
+            String messageInfo = "[신규 공지] " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+            saveNewNotices(newNotices);
+            slackApiCaller.postMessage(messageInfo);
+            slackApiCaller.postMessage(newNotices);
         }
     }
 
-    @Scheduled(fixedDelay = REPEAT_TIME)
-    public void postLeopoldNoticeToSlack() {
-        log.info("레오폴드 공지사항 점검 실행");
-        String strLeopoldNoticeHtml = leopoldApiCaller.getLeopoldNotice();
-        HashSet<String> findNotices = parser.parse(strLeopoldNoticeHtml);
-        String messageInfo = "[업데이트 일자] " + LocalDateTime.now();
-        removePreviousNotice(prevNotices, findNotices);
-        saveCurrentNotices(findNotices);
-        slackApiCaller.postMessage(messageInfo);
-        slackApiCaller.postMessages(findNotices);
+    private HashSet<String> getNewNotices() {
+        String leopoldNoticeHtml = leopoldApiCaller.getLeopoldNotice();
+        HashSet<String> parsedNotices = parser.parse(leopoldNoticeHtml);
+
+        for (String notice :
+                prevNotices) {
+            parsedNotices.remove(notice);
+        }
+
+        return parsedNotices;
     }
 
-    private void saveCurrentNotices(HashSet<String> findNotices) {
+    private void saveNewNotices(HashSet<String> findNotices) {
         log.info("신규 공지사항 저장");
         prevNotices.addAll(findNotices);
+    }
+
+    private boolean hasUpdate(int noticeSize) {
+        return noticeSize > 0;
     }
 }

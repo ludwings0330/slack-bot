@@ -36,22 +36,20 @@ public class SlackApiCaller {
         request.setChannel(channelId);
         request.setText(message);
         try {
-
-            var call = slackApi.postLeopoldNotice(request, authKey);
+            var call = slackApi.postMessage(request, authKey);
             var response = call.execute();
             var body = response.body();
 
             if (!body.isOk()) {
                 throw new RuntimeException("response body null Exception");
             }
-
         } catch (IOException e) {
             log.error("postLeopoldNotice Exception : " + e.getMessage());
             throw new RuntimeException("postLeopoldNotice Exception : " + e.getMessage());
         }
     }
 
-    public void postMessages(HashSet<String> messages) {
+    public void postMessage(HashSet<String> messages) {
         StringBuilder allMessage = new StringBuilder();
 
         for (var message : messages) {

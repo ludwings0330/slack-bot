@@ -14,6 +14,6 @@ public interface SlackApi {
             "Content-type: application/json"
     })
     @POST("api/chat.postMessage")
-    Call<SlackApiDto.SlackPostMessageResponse> postLeopoldNotice(@Body SlackApiDto.SlackPostMessageRequest request, @Header("Authorization") String authHeader);
+    Call<SlackApiDto.SlackPostMessageResponse> postMessage(@Body SlackApiDto.SlackPostMessageRequest request, @Header("Authorization") String authHeader);
 
 }
