@@ -28,12 +28,27 @@ public class SlackBot {
         HashSet<String> newNotices = getNewNotices();
 
         if (hasUpdate(newNotices.size())) {
-            String messageInfo = "[신규 공지] " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            log.info("신규 공지사항 발견");
+            String message = createMessage(newNotices);
 
             saveNewNotices(newNotices);
-            slackApiCaller.postMessage(messageInfo);
-            slackApiCaller.postMessage(newNotices);
+            slackApiCaller.postMessage(message.toString());
         }
+    }
+
+    private String createMessage(HashSet<String> newNotices) {
+        StringBuilder message = new StringBuilder();
+
+        message.append("[신규 공지] ")
+                .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+        for (var notice :
+                newNotices) {
+            message.append(System.lineSeparator())
+                    .append(notice);
+        }
+
+        return message.toString();
     }
 
     private HashSet<String> getNewNotices() {
